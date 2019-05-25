@@ -5,6 +5,8 @@ public interface Game {
     Graphics getGraphics();
     Input getInput();
 
-    Input _input = null;
-    Graphics _graphics = null;
+    void run();
+    void render();
+
+    Image[] _images = new Image[16];
 }

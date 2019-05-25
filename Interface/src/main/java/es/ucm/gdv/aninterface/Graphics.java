@@ -20,4 +20,8 @@ public interface Graphics {
     //De la ventana
     int getWidth();
     int getHeight();
+
+    //Inicio y fin del pintado
+    void startFrame();
+    void postFrame();
 }
