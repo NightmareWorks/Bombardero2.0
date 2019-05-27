@@ -10,13 +10,14 @@ import es.ucm.gdv.aninterface.Input;
 
 public class AndroidGame implements Game {
 
-    public AndroidGame(){ }
+    public AndroidGame(){
+
+    }
 
     //Carga las imágenes
     public void init(AssetManager assets, SurfaceView surface){
         _graphics = new AndroidGraphics(assets,surface);
         _input = new AndroidInput();
-        _images[0] = getGraphics().newImage("logo.png");
     }
 
     @Override
@@ -29,18 +30,6 @@ public class AndroidGame implements Game {
         return _input;
     }
 
-    @Override
-    public void run() {
-        //De momento no hace ni el huevo
-    }
-
-    @Override
-    public void render() {
-        getGraphics().startFrame();
-        getGraphics().clear(0xFF00FF00);
-        getGraphics().drawImage(_images[0],100,100,100,100,0,0,500,500);
-        getGraphics().postFrame();
-    }
 
     AndroidGraphics _graphics;
     AndroidInput _input;

@@ -4,8 +4,11 @@ import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.SurfaceView;
+import android.view.Window;
+import android.view.WindowManager;
 
 import es.ucm.gdv.android.AndroidGame;
+import es.ucm.gdv.logic.Logic;
 
 public class BombAndroid extends AppCompatActivity {
 
@@ -13,9 +16,15 @@ public class BombAndroid extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        //Pantalla completa
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
         _view = new MyView(this);
         _game = new AndroidGame();
         _game.init(this.getAssets(),_view);
+        _logic = new Logic(_game);
+
 
         setContentView(_view);
 
@@ -81,7 +90,7 @@ public class BombAndroid extends AppCompatActivity {
         @Override
         public void run(){
             while(_running) {
-                _game.run();
+                _logic.run();
             }
         }
 
@@ -129,7 +138,7 @@ public class BombAndroid extends AppCompatActivity {
             //Empieza a correr el juego
             while(_running) {
                 //_Logic.run();
-                _game.render();
+                _logic.render();
             }
         }
         volatile boolean _running = false;
@@ -141,5 +150,6 @@ public class BombAndroid extends AppCompatActivity {
     AndroidGame _game;
     gameThread _gameThread;
     renderThread _renderThread;
+    Logic _logic;
 }
 
