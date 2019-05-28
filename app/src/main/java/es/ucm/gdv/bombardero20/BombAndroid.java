@@ -138,7 +138,7 @@ public class BombAndroid extends AppCompatActivity {
             //Empieza a correr el juego
             while(_running) {
                 //_Logic.run();
-                _logic.render();
+                //_logic.render();
             }
         }
         volatile boolean _running = false;
