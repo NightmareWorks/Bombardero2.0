@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.SurfaceView;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -23,6 +24,7 @@ public class BombAndroid extends AppCompatActivity {
         _view = new MyView(this);
         _game = new AndroidGame();
         _game.init(this.getAssets(),_view);
+        _view.setOnTouchListener((View.OnTouchListener)_game.getInput());
         _logic = new Logic(_game);
 
 

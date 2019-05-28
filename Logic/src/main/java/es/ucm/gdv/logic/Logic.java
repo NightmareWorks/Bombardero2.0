@@ -1,9 +1,13 @@
 package es.ucm.gdv.logic;
 
+import java.util.List;
 import java.util.Random;
 
 import es.ucm.gdv.aninterface.Game;
 import es.ucm.gdv.aninterface.Image;
+import es.ucm.gdv.aninterface.Input;
+
+enum State{Intro,Dificulty,Speed,Building,Game,Score}
 
 public class Logic {
     public Logic(Game game){
@@ -12,8 +16,8 @@ public class Logic {
         _screen = new Screen(_game.getGraphics());
         //Inicializamos las imágenes
         loadImages();
-
-        setBoard(_speedW,_speedH,_speedText,_speedColors);
+        _currentState = State.Intro;
+        //setBoard(_speedW,_speedH,_speedText,_speedColors);
         //setBoard(_introW,_introH, _introText,_introColors);
         //setBoard(_dificultyW,_dificultyH,_dificultyText,_dificultyColors);
     }
@@ -54,8 +58,60 @@ public class Logic {
     public void run(){
         //De momento no hace ni el huevo
         //int i = 1;
-        buildCity(5);
+        //buildCity(5);
+        //AQUI VA LA CONDICION DE PARADA DEL JUEGO
+        while (true){
+            switch (_currentState){
+                case Intro:
+                    setBoard(_introW,_introH, _introText,_introColors);
+                    while(_currentState == State.Intro)
+                        introPhaseTick();
+                    break;
+                case Dificulty:
+                    setBoard(_dificultyW,_dificultyH,_dificultyText,_dificultyColors);
+                    while(_currentState == State.Dificulty)
+                        dificultyPhaseTick();
+                    break;
+                case Speed:
+                    break;
+                case Score:
+                    break;
+                case Building:
+                    break;
+                case Game:
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
 
+    //Este tick se ejecuta en la pantalla de inicio
+    private void introPhaseTick(){
+        _evts = _game.getInput().getTouchEvents();
+        if(!_evts.isEmpty()){
+            for(int i = 0; i < _evts.size(); i++){
+                if(_evts.get(i).get_action()) {
+                    _currentState = State.Dificulty;
+                    break;
+                }
+            }
+        }
+        render();
+    }
+
+    //Tick para la pantalla de dificultad
+    private void dificultyPhaseTick(){
+        _evts = _game.getInput().getTouchEvents();
+        if(!_evts.isEmpty()){
+            for(int i = 0; i < _evts.size(); i++){
+                if(_evts.get(i).get_action()) {
+                    _currentState = State.Dificulty;
+                    break;
+                }
+            }
+        }
+        render();
     }
 
     //Pinta cada frame
@@ -163,13 +219,13 @@ public class Logic {
     //El screen se encarga del renderizado
     //Y de darte la casilla que has pulsado
     private Screen _screen;
-    //Experimental
     Random rand = new Random();
+    List<Input.TouchEvent> _evts;
 
     //Vamos a necesitar algún tipo de mutex
     //para que la hebra de pintado no pinte cuando la lógica se está ejecutando
     private volatile boolean _canDraw = true;
-
+    State _currentState;
     private long _lastFrameTime;
 
 

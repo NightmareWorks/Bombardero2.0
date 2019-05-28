@@ -51,6 +51,23 @@ public class Screen {
         }
     }
 
+    //Este metodo recibe unas coordenadas en pixeles
+    //Y devuelve la casilla que ha sido tocada
+    //Como no puedo devolver dos valores, devuelvo un vector
+    //Si el toque queda fuera del screen, devuelvo null
+    public int[] cellTouched(int sX, int sY){
+        int[] cell = new int[2];
+        if(sY < _oriH || sY > _oriH + (_Ycells*_cellH))
+            return null;
+        else if (sX < _oriW || sX > _oriW + (_Xcells*_cellW))
+            return null;
+        else{
+            cell[0] = (sY - _oriH)/_cellH;
+            cell[1] = (sX - _oriW)/_cellW;
+            return cell;
+        }
+    }
+
     //celdas de ancho y de largo del tablero
     private int _Xcells, _Ycells;
     //Píxeles de ancho y de largo de cada celda
