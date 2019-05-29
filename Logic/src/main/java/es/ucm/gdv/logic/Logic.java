@@ -73,12 +73,17 @@ public class Logic {
                         dificultyPhaseTick();
                     break;
                 case Speed:
-                    break;
-                case Score:
+                    setBoard(_speedW,_speedH,_speedText,_speedColors);
+                    while(_currentState == State.Speed)
+                        speedPhaseTick();
                     break;
                 case Building:
+                    while(_currentState == State.Building)
+                        buildCity();
                     break;
                 case Game:
+                    break;
+                case Score:
                     break;
                 default:
                     break;
@@ -90,8 +95,8 @@ public class Logic {
     private void introPhaseTick(){
         _evts = _game.getInput().getTouchEvents();
         if(!_evts.isEmpty()){
-            for(int i = 0; i < _evts.size(); i++){
-                if(_evts.get(i).get_action()) {
+            for (Input.TouchEvent t : _evts){
+                if(t.get_action()) {
                     _currentState = State.Dificulty;
                     break;
                 }
@@ -104,10 +109,112 @@ public class Logic {
     private void dificultyPhaseTick(){
         _evts = _game.getInput().getTouchEvents();
         if(!_evts.isEmpty()){
-            for(int i = 0; i < _evts.size(); i++){
-                if(_evts.get(i).get_action()) {
-                    _currentState = State.Dificulty;
-                    break;
+            int[] cell;
+            for (Input.TouchEvent t : _evts){
+                if(t.get_action()) {
+                    //Comprobamos en qué casilla se ha pulsado
+                    cell = _screen.cellTouched(t.get_x(),t.get_y());
+                    if(cell != null){
+                        if(cell[0] == 2){
+                            switch (cell[1]){
+                                case 10:
+                                    _dificulty = 0;
+                                    _currentState = State.Speed;
+                                    break;
+                                case 13:
+                                    _dificulty = 1;
+                                    _currentState = State.Speed;
+                                    break;
+                                case 16:
+                                    _dificulty = 2;
+                                    _currentState = State.Speed;
+                                    break;
+                                case 19:
+                                    _dificulty = 3;
+                                    _currentState = State.Speed;
+                                    break;
+                                case 22:
+                                    _dificulty = 4;
+                                    _currentState = State.Speed;
+                                    break;
+                                case 25:
+                                    _dificulty = 5;
+                                    _currentState = State.Speed;
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        render();
+    }
+
+    //Tick de la pantalla de velocidad
+    private void speedPhaseTick(){
+        _evts = _game.getInput().getTouchEvents();
+        if(!_evts.isEmpty()){
+            int[] cell;
+            for (Input.TouchEvent t : _evts){
+                if(t.get_action()) {
+                    //Comprobamos en qué casilla se ha pulsado
+                    cell = _screen.cellTouched(t.get_x(),t.get_y());
+                    if(cell != null){
+                        if(cell[0] == 2){
+                            switch (cell[1]){
+                                case 11:
+                                    _dificulty = 0;
+                                    _currentState = State.Building;
+                                    break;
+                                case 14:
+                                    _dificulty = 1;
+                                    _currentState = State.Building;
+                                    break;
+                                case 17:
+                                    _dificulty = 2;
+                                    _currentState = State.Building;
+                                    break;
+                                case 20:
+                                    _dificulty = 3;
+                                    _currentState = State.Building;
+                                    break;
+                                case 23:
+                                    _dificulty = 4;
+                                    _currentState = State.Building;
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                        else if(cell[0] == 4){
+                            switch (cell[1]){
+                                case 11:
+                                    _dificulty = 0;
+                                    _currentState = State.Building;
+                                    break;
+                                case 14:
+                                    _dificulty = 1;
+                                    _currentState = State.Building;
+                                    break;
+                                case 17:
+                                    _dificulty = 2;
+                                    _currentState = State.Building;
+                                    break;
+                                case 20:
+                                    _dificulty = 3;
+                                    _currentState = State.Building;
+                                    break;
+                                case 23:
+                                    _dificulty = 4;
+                                    _currentState = State.Building;
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -166,7 +273,7 @@ public class Logic {
 
     //Va construyendo la ciudad
     //Cuando termina el tablero ya está relleno y se puede empezar a jugar
-    private void buildCity(int dif){
+    private void buildCity(){
         _board = new int[_playingH][_playingW];
         clearBoard();
         setColorBoard(_board[0].length,_board.length,_playingInitialColors);
@@ -174,7 +281,7 @@ public class Logic {
         int[] buildings = new int[11];
         for(int i = 0; i < buildings.length; ++i)
             //La altura de cada edificio es 5 - dif sumado a un valor aleatorio hasta el 7
-            buildings[i] = rand.nextInt(8) + (5 - dif);
+            buildings[i] = rand.nextInt(8) + (5 - _dificulty);
 
         int baseX = 4; int baseY = 21; //El lugar donde se empieza a construir el primer edificio
 
@@ -214,13 +321,15 @@ public class Logic {
                 render();
             }
         }
+        //_currentState = play;
     }
 
     //El screen se encarga del renderizado
     //Y de darte la casilla que has pulsado
     private Screen _screen;
-    Random rand = new Random();
-    List<Input.TouchEvent> _evts;
+    private Random rand = new Random();
+    private List<Input.TouchEvent> _evts;
+    private int _speed, _dificulty;
 
     //Vamos a necesitar algún tipo de mutex
     //para que la hebra de pintado no pinte cuando la lógica se está ejecutando

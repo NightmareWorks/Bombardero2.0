@@ -8,21 +8,21 @@ public interface Input {
     //Indicará el tipo (pulsación, liberación, desplazamiento),
     // la posición y el identificador del “dedo” (o botón).
     class TouchEvent{
-        public TouchEvent(float _x, float _y, Boolean action) {
+        public TouchEvent(int _x, int _y, Boolean action) {
             this._x = _x;
             this._y = _y;
             this._action = action;
         }
 
-        public float get_x() {
+        public int get_x() {
             return _x;
         }
 
-        public float get_y() {
+        public int get_y() {
             return _y;
         }
 
-        private float _x, _y;
+        private int _x, _y;
 
         public boolean get_action() {
             return _action;

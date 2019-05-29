@@ -29,7 +29,7 @@ public class AndroidInput implements Input, View.OnTouchListener {
         if(action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_UP){
             //Nos aseguramos que solo un hilo toca la variable
             synchronized (this){
-                _events.add(new TouchEvent(event.getX(), event.getY(), true));
+                _events.add(new TouchEvent(Math.round(event.getX()), Math.round(event.getY()), true));
             }
             return  true;
         }
