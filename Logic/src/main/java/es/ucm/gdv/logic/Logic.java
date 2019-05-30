@@ -56,11 +56,9 @@ public class Logic {
     }
 
     public void run(){
-        //De momento no hace ni el huevo
-        //int i = 1;
-        //buildCity(5);
+
         //AQUI VA LA CONDICION DE PARADA DEL JUEGO
-        while (true){
+        //while (true){
             switch (_currentState){
                 case Intro:
                     setBoard(_introW,_introH, _introText,_introColors);
@@ -82,13 +80,15 @@ public class Logic {
                         buildCity();
                     break;
                 case Game:
+                    while(_currentState == State.Game)
+                        gameTick();
                     break;
                 case Score:
                     break;
                 default:
                     break;
             }
-        }
+        //}
     }
 
     //Este tick se ejecuta en la pantalla de inicio
@@ -165,23 +165,23 @@ public class Logic {
                         if(cell[0] == 2){
                             switch (cell[1]){
                                 case 11:
-                                    _dificulty = 0;
+                                    _speed = 0;
                                     _currentState = State.Building;
                                     break;
                                 case 14:
-                                    _dificulty = 1;
+                                    _speed = 1;
                                     _currentState = State.Building;
                                     break;
                                 case 17:
-                                    _dificulty = 2;
+                                    _speed = 2;
                                     _currentState = State.Building;
                                     break;
                                 case 20:
-                                    _dificulty = 3;
+                                    _speed = 3;
                                     _currentState = State.Building;
                                     break;
                                 case 23:
-                                    _dificulty = 4;
+                                    _speed = 4;
                                     _currentState = State.Building;
                                     break;
                                 default:
@@ -191,23 +191,23 @@ public class Logic {
                         else if(cell[0] == 4){
                             switch (cell[1]){
                                 case 11:
-                                    _dificulty = 0;
+                                    _speed = 0;
                                     _currentState = State.Building;
                                     break;
                                 case 14:
-                                    _dificulty = 1;
+                                    _speed = 1;
                                     _currentState = State.Building;
                                     break;
                                 case 17:
-                                    _dificulty = 2;
+                                    _speed = 2;
                                     _currentState = State.Building;
                                     break;
                                 case 20:
-                                    _dificulty = 3;
+                                    _speed = 3;
                                     _currentState = State.Building;
                                     break;
                                 case 23:
-                                    _dificulty = 4;
+                                    _speed = 4;
                                     _currentState = State.Building;
                                     break;
                                 default:
@@ -220,6 +220,56 @@ public class Logic {
         }
         render();
     }
+
+    //Tick del game
+    private void gameTick(){
+        //Si toca hacer tick
+        long currentTime = System.nanoTime();
+        if(currentTime - _lastFrameTime > _updateTime) {
+            _lastFrameTime = currentTime;
+
+            //Comprobamos pulsación
+
+
+
+            //Avanza el avion
+
+            //Si el avion llega al final de la linea
+            if (_planeX == 17) {
+                if (_planeY == 21) {
+                    //Termina la partida
+                    _planeY = 1;
+                } else {
+                    _board[_planeY][_planeX] = ' ';
+                    _board[_planeY][_planeX - 1] = ' ';
+                    ++_planeY;
+                    _planeX = 2;
+                }
+            }
+            //Si no
+            else {
+                //Comprobamos si se la ha pegado
+                if (_board[_planeY][_planeX + 1] == 244 || _board[_planeY][_planeX + 1] == 143) {
+                    //explosion
+                    //Habría que crear como un estado en el que durante 3 ticks el avión explote
+                    int i = 0;
+                } else{
+                    _board[_planeY][_planeX - 1] = ' ';
+                    ++_planeX;
+                }
+
+            }
+
+            //Pintamos el avion
+            _board[_planeY][_planeX] = 242;
+            _board[_planeY][_planeX - 1] = 241;
+            _colorBoard[_planeY][_planeX] = 1;
+            _colorBoard[_planeY][_planeX - 1] = 1;
+        }
+        render();
+    }
+
+    int _planeX,_planeY;
 
     //Pinta cada frame
     public void render(){
@@ -321,7 +371,29 @@ public class Logic {
                 render();
             }
         }
-        //_currentState = play;
+        readyGame();
+        render();
+        _currentState = State.Game;
+    }
+
+    //Escribe la línea de puntos debajo de la ciudad
+    //Y coloca el avion en el 0,1
+    private void readyGame(){
+        for(int i = 0; i < _board[23].length; ++i)
+            _board[23][i] = 95;
+        String s = "PUNTOS";
+        for(int i = 0; i < s.length();++i)
+            _board[24][i] = s.charAt(i);
+        s = "MAX";
+        for(int i = 0; i < s.length();++i)
+            _board[24][12+i] = s.charAt(i);
+        _board[24][7] = '0';
+        _board[24][16] = '0';
+
+        _planeX = 1;
+        _planeY = 1;
+
+        _updateTime = (_speed + 1)*0.1e9;
     }
 
     //El screen se encarga del renderizado
@@ -330,6 +402,7 @@ public class Logic {
     private Random rand = new Random();
     private List<Input.TouchEvent> _evts;
     private int _speed, _dificulty;
+    private double _updateTime;
 
     //Vamos a necesitar algún tipo de mutex
     //para que la hebra de pintado no pinte cuando la lógica se está ejecutando
