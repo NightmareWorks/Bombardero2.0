@@ -223,53 +223,158 @@ public class Logic {
 
     //Tick del game
     private void gameTick(){
+        //Comprobamos pulsación si la bomba ya ha impactado y la plantamos
+        //Esto lo hacemos siempre
+        checkBombPress();
+
         //Si toca hacer tick
         long currentTime = System.nanoTime();
         if(currentTime - _lastFrameTime > _updateTime) {
             _lastFrameTime = currentTime;
+            stepBomb();
+            stepPlane();
+        }
+        render();
+    }
 
-            //Comprobamos pulsación
-
-
-
-            //Avanza el avion
-
-            //Si el avion llega al final de la linea
-            if (_planeX == 17) {
-                if (_planeY == 21) {
-                    //Termina la partida
-                    _planeY = 1;
-                } else {
-                    _board[_planeY][_planeX] = ' ';
-                    _board[_planeY][_planeX - 1] = ' ';
-                    ++_planeY;
-                    _planeX = 2;
+    //Métodos auxiliares del update del juego
+    private void stepBomb(){
+        //Avanzamos la bomba
+        if(_bombIntensity > 0){
+            ++_bombY;
+            //Si la bomba colisiona seguimos la estela de destrucción
+            if(_board[_bombY][_bombX] == 244 || _board[_bombY][_bombX] == 143){
+                //disminuyo la intensidad de la bomba y exploto el piso
+                --_bombIntensity;
+                _board[_bombY][_bombX] = 238;
+                _colorBoard[_bombY][_bombX] = 2;
+            }
+            //Si no colisiona sigue cayendo
+            else{
+                //Si la bomba ya ha llegado al final del tablero desaparece
+                if(_bombY == 22){
+                    _bombIntensity = 0;
+                }
+                else{
+                    _board[_bombY][_bombX] = 252;
+                    _colorBoard[_bombY][_bombX] = 2;
                 }
             }
-            //Si no
-            else {
-                //Comprobamos si se la ha pegado
-                if (_board[_planeY][_planeX + 1] == 244 || _board[_planeY][_planeX + 1] == 143) {
-                    //explosion
-                    //Habría que crear como un estado en el que durante 3 ticks el avión explote
-                    int i = 0;
-                } else{
-                    _board[_planeY][_planeX - 1] = ' ';
-                    ++_planeX;
-                }
+            //Borro la explosion anterior
+            if(_board[_bombY - 1][_bombX] == 252 || _board[_bombY-1][_bombX] == 238)
+                _board[_bombY - 1][_bombX] = ' ';
+            //Activo el bool para borrar la ultima explosion
+            if(_bombIntensity == 0)
+                _bombEnded = true;
+        }
+        if(_bombEnded) {
+            //Borro la ultima explosion
+            _board[_bombY][_bombX] = ' ';
+            _bombEnded = false;
+        }
+    }
 
+    //Comprueba pulsación para lanzar la bomba
+    private void checkBombPress(){
+        if(_bombIntensity == 0 && !_colisioned) {
+            _evts = _game.getInput().getTouchEvents();
+            if (!_evts.isEmpty()) {
+                for (Input.TouchEvent t : _evts) {
+                    if (t.get_action()) {
+                        //LO PONGO EXAGERADO PARA PODER PASARME EL JUEGO JEJE
+                        _bombIntensity = rand.nextInt(3) + 20;
+                        if (_planeX == 17){
+                            _bombX = 2;
+                            _bombY = _planeY + 1;
+                        }
+                        else {
+                            _bombX = _planeX + 1;
+                            _bombY = _planeY;
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    //Avance del avion
+    private void stepPlane(){
+        //Avanza el avion
+        //Si el avion llega al final de la linea
+        if (_planeX == 17) {
+            if (_planeY == 21) {
+                //Termina la partida
+                //Construye una ciudad nueva com más velocidad y más dificultad
+                if(_speed > 0)
+                    _speed--;
+                if(_dificulty > 0)
+                    _dificulty--;
+                _currentState = State.Building;
+            } else {
+                _board[_planeY][_planeX] = ' ';
+                _board[_planeY][_planeX - 1] = ' ';
+                ++_planeY;
+                _planeX = 2;
+            }
+        }
+        //Si no
+        else {
+            //Comprobamos si se la ha pegado
+            if (_board[_planeY][_planeX + 1] == 244 || _board[_planeY][_planeX + 1] == 143) {
+                _colisioned = true;
+                _board[_planeY][_planeX] = ' ';
+                _board[_planeY][_planeX - 1] = ' ';
+                _planeX++;
+                //Llamamos a un metodo con la animación de muerte
+                deathAnimation();
+                //Pasamos a la pantalla de puntuación
+
+
+            } else{
+                _board[_planeY][_planeX - 1] = ' ';
+                ++_planeX;
             }
 
+        }
+
+        if(!_colisioned) {
             //Pintamos el avion
             _board[_planeY][_planeX] = 242;
             _board[_planeY][_planeX - 1] = 241;
             _colorBoard[_planeY][_planeX] = 1;
             _colorBoard[_planeY][_planeX - 1] = 1;
         }
-        render();
     }
 
+    //Método con la animación de muerte
+    private void deathAnimation(){
+        _lastFrameTime = System.nanoTime();
+        _colorBoard[_planeY][_planeX] = 1;
+        int frames = 24;
+        int sprite = 0;
+        while(frames > 0){
+            long currentTime = System.nanoTime();
+            if(currentTime - _lastFrameTime > 0.1e9){
+                _lastFrameTime = currentTime;
+                if(sprite % 3 == 0)
+                    _board[_planeY][_planeX] = 238;
+                else if(sprite % 3 == 1)
+                    _board[_planeY][_planeX] = 253;
+                else
+                    _board[_planeY][_planeX] = 188;
+                ++sprite;
+                --frames;
+                render();
+            }
+        }
+    }
+
+    //Posicion del avion y la bomba, y numero de pisos que puede destruir
     int _planeX,_planeY;
+    int _bombX, _bombY, _bombIntensity;
+    boolean _bombEnded; //Este es para borrar el último sprite de explosión de la bomba
+    boolean _colisioned = false; //Si el avion se la ha pegado, no puede lanzar bombas
 
     //Pinta cada frame
     public void render(){
