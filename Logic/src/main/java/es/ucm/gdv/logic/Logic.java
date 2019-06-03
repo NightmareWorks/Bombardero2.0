@@ -22,16 +22,6 @@ public class Logic {
         //setBoard(_dificultyW,_dificultyH,_dificultyText,_dificultyColors);
     }
 
-    //Experimental
-    private void seteoChungo(){
-        for(int i = 0; i < _board.length;i++){
-            for(int j = 0; j < _board[0].length;j++){
-                _board[i][j] = rand.nextInt(256);
-                _colorBoard[i][j] = rand.nextInt(15);
-            }
-        }
-    }
-
     //Este método transforma un string bruto en cada
     //caracter para después generar el tablero
     private void setBoard(int w, int h, String grid, String colorsGrid){
@@ -84,6 +74,10 @@ public class Logic {
                         gameTick();
                     break;
                 case Score:
+                    setBoard(_endW,_endH,_endText,_endColors);
+                    setFinalHiScore();
+                    while (_currentState == State.Score)
+                        endTick();
                     break;
                 default:
                     break;
@@ -248,6 +242,10 @@ public class Logic {
                 --_bombIntensity;
                 _board[_bombY][_bombX] = 238;
                 _colorBoard[_bombY][_bombX] = 2;
+
+                //Aumenta puntuación
+                _score += 5;
+                setScore();
             }
             //Si no colisiona sigue cayendo
             else{
@@ -296,6 +294,11 @@ public class Logic {
                 }
             }
         }
+        //De esta forma volcamos la lista y no se guarda
+        //el input para cuando esté disponible
+        //(Evitamos que la bomba caiga sola si hemos pulsado antes)
+        else
+            _game.getInput().getTouchEvents();
     }
 
     //Avance del avion
@@ -306,6 +309,7 @@ public class Logic {
             if (_planeY == 21) {
                 //Termina la partida
                 //Construye una ciudad nueva com más velocidad y más dificultad
+                _keepscore = true;
                 if(_speed > 0)
                     _speed--;
                 if(_dificulty > 0)
@@ -329,9 +333,12 @@ public class Logic {
                 //Llamamos a un metodo con la animación de muerte
                 deathAnimation();
                 //Pasamos a la pantalla de puntuación
-
-
-            } else{
+                if(_score > _hiScore)
+                    _hiScore = _score;
+                _currentState = State.Score;
+            }
+            //Si no, seguimos
+            else{
                 _board[_planeY][_planeX - 1] = ' ';
                 ++_planeX;
             }
@@ -353,13 +360,13 @@ public class Logic {
         _colorBoard[_planeY][_planeX] = 1;
         int frames = 24;
         int sprite = 0;
-        while(frames > 0){
+        while(frames > 0) {
             long currentTime = System.nanoTime();
-            if(currentTime - _lastFrameTime > 0.1e9){
+            if (currentTime - _lastFrameTime > 0.1e9) {
                 _lastFrameTime = currentTime;
-                if(sprite % 3 == 0)
+                if (sprite % 3 == 0)
                     _board[_planeY][_planeX] = 238;
-                else if(sprite % 3 == 1)
+                else if (sprite % 3 == 1)
                     _board[_planeY][_planeX] = 253;
                 else
                     _board[_planeY][_planeX] = 188;
@@ -368,6 +375,20 @@ public class Logic {
                 render();
             }
         }
+    }
+
+    //Tick de la pantalla de puntuación
+    private void endTick(){ //En realidad es el mismo método que el del título
+        _evts = _game.getInput().getTouchEvents();
+        if(!_evts.isEmpty()){
+            for (Input.TouchEvent t : _evts){
+                if(t.get_action()) {
+                    _currentState = State.Dificulty;
+                    break;
+                }
+            }
+        }
+        render();
     }
 
     //Posicion del avion y la bomba, y numero de pisos que puede destruir
@@ -484,6 +505,7 @@ public class Logic {
     //Escribe la línea de puntos debajo de la ciudad
     //Y coloca el avion en el 0,1
     private void readyGame(){
+        //GUI
         for(int i = 0; i < _board[23].length; ++i)
             _board[23][i] = 95;
         String s = "PUNTOS";
@@ -492,13 +514,24 @@ public class Logic {
         s = "MAX";
         for(int i = 0; i < s.length();++i)
             _board[24][12+i] = s.charAt(i);
-        _board[24][7] = '0';
-        _board[24][16] = '0';
 
+        //Posicion del avion, tiempo de update
+        // y establecimiento del avion y las bombas
         _planeX = 1;
         _planeY = 1;
 
         _updateTime = (_speed + 1)*0.1e9;
+
+        _colisioned = false;
+        _bombIntensity = 0;
+
+        //Establecemos las puntuaciones iniciales
+        if(!_keepscore) {
+            _score = 0;
+            _board[24][7] = '0';
+        }
+        _keepscore = false;
+        setGameHiScore();
     }
 
     //El screen se encarga del renderizado
@@ -515,8 +548,76 @@ public class Logic {
     State _currentState;
     private long _lastFrameTime;
 
+    //Puntuaciones y relacionado
+    private int _score;
+    private int _hiScore = 0;
+    private boolean _keepscore = false;
 
+    private void setScore(){
+        int c = _score/100;
+        int d = (_score%100)/10;
+        int u = (_score%100)%10;
 
+        if(c > 0){
+            _board[24][7] = String.valueOf(c).charAt(0);
+            _board[24][8] = String.valueOf(d).charAt(0);
+            _board[24][9] = String.valueOf(u).charAt(0);
+        }
+        else if(d > 0){
+            _board[24][7] = String.valueOf(d).charAt(0);
+            _board[24][8] = String.valueOf(u).charAt(0);
+            _board[24][9] = ' ';
+        }
+        else{
+            _board[24][7] = String.valueOf(u).charAt(0);
+            _board[24][8] = ' ';
+            _board[24][9] = ' ';
+        }
+    }
+
+    private void setGameHiScore(){
+        int c = _hiScore/100;
+        int d = (_hiScore%100)/10;
+        int u = (_hiScore%100)%10;
+
+        if(c > 0){
+            _board[24][16] = String.valueOf(c).charAt(0);
+            _board[24][17] = String.valueOf(d).charAt(0);
+            _board[24][18] = String.valueOf(u).charAt(0);
+        }
+        else if(d > 0){
+            _board[24][16] = String.valueOf(d).charAt(0);
+            _board[24][17] = String.valueOf(u).charAt(0);
+            _board[24][18] = ' ';
+        }
+        else{
+            _board[24][16] = String.valueOf(u).charAt(0);
+            _board[24][17] = ' ';
+            _board[24][18] = ' ';
+        }
+    }
+
+    private void setFinalHiScore(){
+        int c = _hiScore/100;
+        int d = (_hiScore%100)/10;
+        int u = (_hiScore%100)%10;
+
+        if(c > 0){
+            _board[0][14] = String.valueOf(c).charAt(0);
+            _board[0][15] = String.valueOf(d).charAt(0);
+            _board[0][16] = String.valueOf(u).charAt(0);
+        }
+        else if(d > 0){
+            _board[0][14] = String.valueOf(d).charAt(0);
+            _board[0][15] = String.valueOf(u).charAt(0);
+            _board[0][16] = ' ';
+        }
+        else{
+            _board[0][14] = String.valueOf(u).charAt(0);
+            _board[0][15] = ' ';
+            _board[0][16] = ' ';
+        }
+    }
 
     /////////////Pantallas del juego//////////////////////
 
@@ -625,6 +726,27 @@ public class Logic {
             "99999999999999999999" +
             "22222299999922299999";
 
-    //Pantalla de victoria
-    // . . .
+    //Pantalla de puntuación
+    private int _endW = 20;
+    private int _endH = 10;
+    private String _endText = "Ha conseguido 000   " +
+            "puntos              " +
+            "                    " +
+            "                    " +
+            "                    " +
+            "BATIO EL RECORD!!   " +
+            "                    " +
+            "                    " +
+            "Pulse para volver a " +
+            "empezar             ";
+    private String _endColors = "22222222222222222222" +
+            "22222222222222222222" +
+            "22222222222222222222" +
+            "22222222222222222222" +
+            "22222222222222222222" +
+            "22222222222222222222" +
+            "22222222222222222222" +
+            "22222222222222222222" +
+            "22222222222222222222" +
+            "22222222222222222222";
 }
