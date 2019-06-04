@@ -101,15 +101,19 @@ public class Logic {
             case Score:
                 setBoard(_endW,_endH,_endText,_endColors);
                 setFinalHiScore();
+                _screen.setScreen(_board[0].length,_board.length,false);
                 break;
             case Difficulty:
                 setBoard(_difficultyW,_difficultyH, _difficultyText, _difficultyColors);
+                _screen.setScreen(_board[0].length,_board.length,false);
                 break;
             case Speed:
                 setBoard(_speedW,_speedH,_speedText,_speedColors);
+                _screen.setScreen(_board[0].length,_board.length,false);
                 break;
             case Intro:
                 setBoard(_introW,_introH, _introText,_introColors);
+                _screen.setScreen(_board[0].length,_board.length,false);
                 break;
             default:
                 break;
@@ -215,23 +219,23 @@ public class Logic {
                         else if(cell[0] == 4){
                             switch (cell[1]){
                                 case 11:
-                                    _speed = 0;
+                                    _speed = 5;
                                     setState(State.Building);
                                     break;
                                 case 14:
-                                    _speed = 1;
+                                    _speed = 6;
                                     setState(State.Building);
                                     break;
                                 case 17:
-                                    _speed = 2;
+                                    _speed = 7;
                                     setState(State.Building);
                                     break;
                                 case 20:
-                                    _speed = 3;
+                                    _speed = 8;
                                     setState(State.Building);
                                     break;
                                 case 23:
-                                    _speed = 4;
+                                    _speed = 9;
                                     setState(State.Building);
                                     break;
                                 default:
@@ -248,6 +252,7 @@ public class Logic {
     //Cuando termina el tablero ya está relleno y se puede empezar a jugar
     private void buildCity(){
         _board = new int[_playingH][_playingW];
+        _screen.setScreen(_playingW,_playingH,true);
         clearBoard();
         setColorBoard(_board[0].length,_board.length,_playingInitialColors);
 
@@ -312,7 +317,7 @@ public class Logic {
         _planeX = 1;
         _planeY = 1;
 
-        _updateTime = (_speed + 1)*0.1e9;
+        _updateTime = (_speed + 0.1)*0.05e9;
 
         _collisioned = false;
         _bombIntensity = 0;

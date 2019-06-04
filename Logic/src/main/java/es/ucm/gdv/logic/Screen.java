@@ -13,33 +13,42 @@ public class Screen {
 
     //Segun el tamaño de pantalla del que dispongamos, damos un tamaño u otro a las celdas
     // Y colocamos la esquina superior izquierda del tablero
-    private void setCellDimensions(){
+    private void setCellDimensions(boolean x2){
         int totalW = _graphics.getWidth();
         int totalH = _graphics.getHeight();
 
-        _cellH = totalH/_Ycells;
-        _cellW = _cellH*2;
-        if(_cellW * _Xcells > totalW){
-            _cellW = totalW/_Xcells;
-            _cellH = _cellW/2;
+        //Si por cada pixel de alto hay dos de ancho
+        if(x2) {
+            _cellH = totalH / _Ycells;
+            _cellW = _cellH * 2;
+            if (_cellW * _Xcells > totalW) {
+                _cellW = totalW / _Xcells;
+                _cellH = _cellW / 2;
+            }
         }
+        else{
+            _cellW = _cellH = totalH / _Ycells;
+            if (_cellW * _Xcells > totalW) {
+                _cellH = _cellW = totalW / _Xcells;
 
-        _oriW = (totalW - _cellW*_Xcells)/2;
-        _oriH = (totalH - _cellH*_Ycells)/2;
+            }
+        }
+        _oriW = (totalW - _cellW * _Xcells) / 2;
+        _oriH = (totalH - _cellH * _Ycells) / 2;
+
     }
 
     //Este método adecua las celdas segun el numero de ellas
-    public void setScreen(int xCells, int yCells){
+    public void setScreen(int xCells, int yCells, boolean x2){
         _Xcells = xCells;
         _Ycells = yCells;
 
-        setCellDimensions();
+        setCellDimensions(x2);
     }
 
     //Este método pinta el tablero entero sin necesidad de tener sprites
     //Recibe el propio tablero y un vector con las imágenes disponibles
     public void drawScreen(int[][] board, int[][] colorBoard, Image[] pngs){
-        setScreen(board[0].length,board.length);
         for(int i = 0; i < board.length;++i){
             for(int j = 0; j < board[0].length;++j){
                 int imX = (board[i][j] % SPRITE_S) * SPRITE_S;

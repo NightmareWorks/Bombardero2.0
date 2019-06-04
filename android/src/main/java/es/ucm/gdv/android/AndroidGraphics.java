@@ -1,12 +1,16 @@
 package es.ucm.gdv.android;
 
+import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.graphics.Rect;
+import android.view.Display;
 import android.view.SurfaceView;
+import android.view.WindowManager;
 
 import java.io.InputStream;
 
@@ -15,9 +19,15 @@ import es.ucm.gdv.aninterface.Image;
 
 public class AndroidGraphics implements Graphics {
 
-    public AndroidGraphics(AssetManager assetManager, SurfaceView surface){
-        _assetManager = assetManager;
+    public AndroidGraphics(Context context, SurfaceView surface){
+        _assetManager = context.getAssets();
         _surface = surface;
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        Display display = wm.getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        _width = size.x;
+        _height = size.y;
     }
 
     @Override
@@ -58,12 +68,12 @@ public class AndroidGraphics implements Graphics {
 
     @Override
     public int getWidth() {
-        return _surface.getWidth();
+        return _width;
     }
 
     @Override
     public int getHeight() {
-        return _surface.getHeight();
+        return _height;
     }
 
     @Override
@@ -81,4 +91,5 @@ public class AndroidGraphics implements Graphics {
     Canvas _canvas;
     AssetManager _assetManager;
     SurfaceView _surface;
+    int _height, _width;
 }

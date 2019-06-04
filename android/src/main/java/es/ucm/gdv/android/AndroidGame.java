@@ -15,8 +15,8 @@ public class AndroidGame implements Game {
     }
 
     //Carga las imágenes
-    public void init(AssetManager assets, SurfaceView surface){
-        _graphics = new AndroidGraphics(assets,surface);
+    public void init(Context context, SurfaceView surface){
+        _graphics = new AndroidGraphics(context,surface);
         _input = new AndroidInput();
     }
 
