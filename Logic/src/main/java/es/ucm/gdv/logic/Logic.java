@@ -333,8 +333,12 @@ public class Logic {
                 //Llamamos a un metodo con la animación de muerte
                 deathAnimation();
                 //Pasamos a la pantalla de puntuación
-                if(_score > _hiScore)
+                if(_score > _hiScore) {
                     _hiScore = _score;
+                    _record = true;
+                }
+                else
+                    _record = false;
                 _currentState = State.Score;
             }
             //Si no, seguimos
@@ -429,7 +433,7 @@ public class Logic {
     //Símbolos importantes:
     //Además de los de cada letra en ascii
     /*244 Tejado de los edificios
-    143 “Pisos” de los edificios
+    143 Pisos de los edificios
     241 Lado izquierdo del avión
     242 Lado derecho del avión
     252 Bomba
@@ -528,8 +532,8 @@ public class Logic {
         //Establecemos las puntuaciones iniciales
         if(!_keepscore) {
             _score = 0;
-            _board[24][7] = '0';
         }
+        setScore();
         _keepscore = false;
         setGameHiScore();
     }
@@ -598,9 +602,9 @@ public class Logic {
     }
 
     private void setFinalHiScore(){
-        int c = _hiScore/100;
-        int d = (_hiScore%100)/10;
-        int u = (_hiScore%100)%10;
+        int c = _score/100;
+        int d = (_score%100)/10;
+        int u = (_score%100)%10;
 
         if(c > 0){
             _board[0][14] = String.valueOf(c).charAt(0);
@@ -617,6 +621,10 @@ public class Logic {
             _board[0][15] = ' ';
             _board[0][16] = ' ';
         }
+
+        //Si hay record escribimos que lo hay
+        if(_record)
+            writeRecordLine();
     }
 
     /////////////Pantallas del juego//////////////////////
@@ -734,7 +742,7 @@ public class Logic {
             "                    " +
             "                    " +
             "                    " +
-            "BATIO EL RECORD!!   " +
+            "                    " +
             "                    " +
             "                    " +
             "Pulse para volver a " +
@@ -749,4 +757,12 @@ public class Logic {
             "22222222222222222222" +
             "22222222222222222222" +
             "22222222222222222222";
+    private boolean _record;
+
+    private void writeRecordLine(){
+        String p = "BATIO EL RECORD!!   ";
+        for(int i = 0; i < _board[0].length; ++i){
+            _board[5][i] = p.charAt(i);
+        }
+    }
 }
