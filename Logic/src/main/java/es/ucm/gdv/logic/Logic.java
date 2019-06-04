@@ -7,7 +7,7 @@ import es.ucm.gdv.aninterface.Game;
 import es.ucm.gdv.aninterface.Image;
 import es.ucm.gdv.aninterface.Input;
 
-enum State{Intro,Dificulty,Speed,Building,Game,Score}
+enum State{Intro, Difficulty, Speed, Building, Game, Score}
 
 public class Logic {
     public Logic(Game game){
@@ -16,10 +16,23 @@ public class Logic {
         _screen = new Screen(_game.getGraphics());
         //Inicializamos las imágenes
         loadImages();
-        _currentState = State.Intro;
-        //setBoard(_speedW,_speedH,_speedText,_speedColors);
-        //setBoard(_introW,_introH, _introText,_introColors);
-        //setBoard(_dificultyW,_dificultyH,_dificultyText,_dificultyColors);
+
+        setState(State.Intro);
+    }
+
+    //Pinta cada frame
+    public void render(){
+        _game.getGraphics().startFrame();
+        _game.getGraphics().clear(0xFF000000);
+        _screen.drawScreen(_board, _colorBoard, _images);
+        _game.getGraphics().postFrame();
+    }
+
+    private void loadImages(){
+        for(int i = 0; i < _images.length; i++) {
+            String name = "ASCII_" + String.format("%02d", i) + ".png";
+            _images[i] = _game.getGraphics().newImage(name);
+        }
     }
 
     //Este método transforma un string bruto en cada
@@ -35,6 +48,15 @@ public class Logic {
         }
     }
 
+    //Hace que todos los caracteres de la matriz sean un espacio en blanco
+    private void clearBoard(){
+        for(int i = 0; i < _board.length; ++i){
+            for(int j = 0; j < _board[0].length; ++j){
+                _board[i][j] = 32;
+            }
+        }
+    }
+
     //Más específico que el anterior, sólo se llama en la pantalla de juego
     private void setColorBoard(int w, int h, String colorsGrid){
         _colorBoard = new int[h][w];
@@ -45,62 +67,71 @@ public class Logic {
         }
     }
 
+    //Es el tick del juego
     public void run(){
-
-        //AQUI VA LA CONDICION DE PARADA DEL JUEGO
-        //while (true){
-            switch (_currentState){
-                case Intro:
-                    setBoard(_introW,_introH, _introText,_introColors);
-                    while(_currentState == State.Intro)
-                        introPhaseTick();
-                    break;
-                case Dificulty:
-                    setBoard(_dificultyW,_dificultyH,_dificultyText,_dificultyColors);
-                    while(_currentState == State.Dificulty)
-                        dificultyPhaseTick();
-                    break;
-                case Speed:
-                    setBoard(_speedW,_speedH,_speedText,_speedColors);
-                    while(_currentState == State.Speed)
-                        speedPhaseTick();
-                    break;
-                case Building:
-                    while(_currentState == State.Building)
-                        buildCity();
-                    break;
-                case Game:
-                    while(_currentState == State.Game)
-                        gameTick();
-                    break;
-                case Score:
-                    setBoard(_endW,_endH,_endText,_endColors);
-                    setFinalHiScore();
-                    while (_currentState == State.Score)
-                        endTick();
-                    break;
-                default:
-                    break;
-            }
-        //}
-    }
-
-    //Este tick se ejecuta en la pantalla de inicio
-    private void introPhaseTick(){
-        _evts = _game.getInput().getTouchEvents();
-        if(!_evts.isEmpty()){
-            for (Input.TouchEvent t : _evts){
-                if(t.get_action()) {
-                    _currentState = State.Dificulty;
-                    break;
-                }
-            }
+        switch (_currentState){
+            case Intro:
+                introAndEndPhaseTick();
+                break;
+            case Difficulty:
+                difficultyPhaseTick();
+                break;
+            case Speed:
+                speedPhaseTick();
+                break;
+            case Building:
+                buildCity();
+                break;
+            case Game:
+                gameTick();
+                break;
+            case Score:
+                introAndEndPhaseTick();
+                break;
+            default:
+                break;
         }
         render();
     }
 
+    //Método auxiliar para cambiar de estado
+    private void setState(State newState){
+        _currentState = newState;
+        switch (_currentState){
+            case Score:
+                setBoard(_endW,_endH,_endText,_endColors);
+                setFinalHiScore();
+                break;
+            case Difficulty:
+                setBoard(_difficultyW,_difficultyH, _difficultyText, _difficultyColors);
+                break;
+            case Speed:
+                setBoard(_speedW,_speedH,_speedText,_speedColors);
+                break;
+            case Intro:
+                setBoard(_introW,_introH, _introText,_introColors);
+                break;
+            default:
+                break;
+        }
+    }
+
+    //Este tick se ejecuta en la pantalla de inicio
+    //Y en la de puntuación
+    private void introAndEndPhaseTick(){
+        _evts = _game.getInput().getTouchEvents();
+        if(!_evts.isEmpty()){
+            for (Input.TouchEvent t : _evts){
+                if(t.get_action()) {
+                    setState(State.Difficulty);
+                    break;
+                }
+            }
+        }
+    }
+
     //Tick para la pantalla de dificultad
-    private void dificultyPhaseTick(){
+    private void difficultyPhaseTick(){
         _evts = _game.getInput().getTouchEvents();
         if(!_evts.isEmpty()){
             int[] cell;
@@ -112,28 +143,28 @@ public class Logic {
                         if(cell[0] == 2){
                             switch (cell[1]){
                                 case 10:
-                                    _dificulty = 0;
-                                    _currentState = State.Speed;
+                                    _difficulty = 0;
+                                    setState(State.Speed);
                                     break;
                                 case 13:
-                                    _dificulty = 1;
-                                    _currentState = State.Speed;
+                                    _difficulty = 1;
+                                    setState(State.Speed);
                                     break;
                                 case 16:
-                                    _dificulty = 2;
-                                    _currentState = State.Speed;
+                                    _difficulty = 2;
+                                    setState(State.Speed);
                                     break;
                                 case 19:
-                                    _dificulty = 3;
-                                    _currentState = State.Speed;
+                                    _difficulty = 3;
+                                    setState(State.Speed);
                                     break;
                                 case 22:
-                                    _dificulty = 4;
-                                    _currentState = State.Speed;
+                                    _difficulty = 4;
+                                    setState(State.Speed);
                                     break;
                                 case 25:
-                                    _dificulty = 5;
-                                    _currentState = State.Speed;
+                                    _difficulty = 5;
+                                    setState(State.Speed);
                                     break;
                                 default:
                                     break;
@@ -143,7 +174,6 @@ public class Logic {
                 }
             }
         }
-        render();
     }
 
     //Tick de la pantalla de velocidad
@@ -160,23 +190,23 @@ public class Logic {
                             switch (cell[1]){
                                 case 11:
                                     _speed = 0;
-                                    _currentState = State.Building;
+                                    setState(State.Building);
                                     break;
                                 case 14:
                                     _speed = 1;
-                                    _currentState = State.Building;
+                                    setState(State.Building);
                                     break;
                                 case 17:
                                     _speed = 2;
-                                    _currentState = State.Building;
+                                    setState(State.Building);
                                     break;
                                 case 20:
                                     _speed = 3;
-                                    _currentState = State.Building;
+                                    setState(State.Building);
                                     break;
                                 case 23:
                                     _speed = 4;
-                                    _currentState = State.Building;
+                                    setState(State.Building);
                                     break;
                                 default:
                                     break;
@@ -186,23 +216,23 @@ public class Logic {
                             switch (cell[1]){
                                 case 11:
                                     _speed = 0;
-                                    _currentState = State.Building;
+                                    setState(State.Building);
                                     break;
                                 case 14:
                                     _speed = 1;
-                                    _currentState = State.Building;
+                                    setState(State.Building);
                                     break;
                                 case 17:
                                     _speed = 2;
-                                    _currentState = State.Building;
+                                    setState(State.Building);
                                     break;
                                 case 20:
                                     _speed = 3;
-                                    _currentState = State.Building;
+                                    setState(State.Building);
                                     break;
                                 case 23:
                                     _speed = 4;
-                                    _currentState = State.Building;
+                                    setState(State.Building);
                                     break;
                                 default:
                                     break;
@@ -212,7 +242,88 @@ public class Logic {
                 }
             }
         }
+    }
+
+    //Va construyendo la ciudad
+    //Cuando termina el tablero ya está relleno y se puede empezar a jugar
+    private void buildCity(){
+        _board = new int[_playingH][_playingW];
+        clearBoard();
+        setColorBoard(_board[0].length,_board.length,_playingInitialColors);
+
+        int[] buildings = new int[11];
+        for(int i = 0; i < buildings.length; ++i)
+            //La altura de cada edificio es 5 - dif sumado a un valor aleatorio hasta el 7
+            buildings[i] = rand.nextInt(8) + (5 - _difficulty);
+
+        int baseX = 4; int baseY = 21; //El lugar donde se empieza a construir el primer edificio
+
+        _lastFrameTime = System.nanoTime();
+        int i = 0;
+        int j = 0;
+        int endedBuildings = 0;
+        while(endedBuildings < buildings.length){
+            long currentTime = System.nanoTime();
+            if(currentTime - _lastFrameTime > 0.1e9){
+                //Si el edificio tiene más de un piso
+                if(buildings[j] > 1){
+                    _board[baseY - i][baseX + j] = 143;
+                    --buildings[j];
+                    ++i;
+                }
+                //Si al edificio le falta un piso
+                else if(buildings[j] == 1){
+                    _board[baseY - i][baseX + j] = 244;
+                    --buildings[j];
+                    ++j;
+                    ++endedBuildings;
+                    i = 0;
+                }
+                //Si el edificio no tiene pisos
+                else if(buildings[j] == 0){
+                    ++j;
+                    ++endedBuildings;
+                    i = 0;
+                }
+
+                render();
+            }
+        }
+        readyGame();
         render();
+        setState(State.Game);
+    }
+
+    //Escribe la línea de puntos debajo de la ciudad
+    //Y coloca el avion en el 0,1
+    private void readyGame(){
+        //GUI
+        for(int i = 0; i < _board[23].length; ++i)
+            _board[23][i] = 95;
+        String s = "PUNTOS";
+        for(int i = 0; i < s.length();++i)
+            _board[24][i] = s.charAt(i);
+        s = "MAX";
+        for(int i = 0; i < s.length();++i)
+            _board[24][12+i] = s.charAt(i);
+
+        //Posicion del avion, tiempo de update
+        // y establecimiento del avion y las bombas
+        _planeX = 1;
+        _planeY = 1;
+
+        _updateTime = (_speed + 1)*0.1e9;
+
+        _collisioned = false;
+        _bombIntensity = 0;
+
+        //Establecemos las puntuaciones iniciales
+        if(!_keepscore) {
+            _score = 0;
+        }
+        setScore();
+        _keepscore = false;
+        setGameHiScore();
     }
 
     //Tick del game
@@ -228,7 +339,6 @@ public class Logic {
             stepBomb();
             stepPlane();
         }
-        render();
     }
 
     //Métodos auxiliares del update del juego
@@ -265,8 +375,9 @@ public class Logic {
             if(_bombIntensity == 0)
                 _bombEnded = true;
         }
+
+        //Este if se usa para borrar el último sprite de explosión
         if(_bombEnded) {
-            //Borro la ultima explosion
             _board[_bombY][_bombX] = ' ';
             _bombEnded = false;
         }
@@ -274,7 +385,7 @@ public class Logic {
 
     //Comprueba pulsación para lanzar la bomba
     private void checkBombPress(){
-        if(_bombIntensity == 0 && !_colisioned) {
+        if(_bombIntensity == 0 && !_collisioned) {
             _evts = _game.getInput().getTouchEvents();
             if (!_evts.isEmpty()) {
                 for (Input.TouchEvent t : _evts) {
@@ -312,9 +423,9 @@ public class Logic {
                 _keepscore = true;
                 if(_speed > 0)
                     _speed--;
-                if(_dificulty > 0)
-                    _dificulty--;
-                _currentState = State.Building;
+                if(_difficulty > 0)
+                    _difficulty--;
+                setState(State.Building);
             } else {
                 _board[_planeY][_planeX] = ' ';
                 _board[_planeY][_planeX - 1] = ' ';
@@ -326,12 +437,14 @@ public class Logic {
         else {
             //Comprobamos si se la ha pegado
             if (_board[_planeY][_planeX + 1] == 244 || _board[_planeY][_planeX + 1] == 143) {
-                _colisioned = true;
+                _collisioned = true;
                 _board[_planeY][_planeX] = ' ';
                 _board[_planeY][_planeX - 1] = ' ';
                 _planeX++;
+
                 //Llamamos a un metodo con la animación de muerte
                 deathAnimation();
+
                 //Pasamos a la pantalla de puntuación
                 if(_score > _hiScore) {
                     _hiScore = _score;
@@ -339,7 +452,7 @@ public class Logic {
                 }
                 else
                     _record = false;
-                _currentState = State.Score;
+                setState(State.Score);
             }
             //Si no, seguimos
             else{
@@ -349,7 +462,7 @@ public class Logic {
 
         }
 
-        if(!_colisioned) {
+        if(!_collisioned) {
             //Pintamos el avion
             _board[_planeY][_planeX] = 242;
             _board[_planeY][_planeX - 1] = 241;
@@ -381,48 +494,16 @@ public class Logic {
         }
     }
 
-    //Tick de la pantalla de puntuación
-    private void endTick(){ //En realidad es el mismo método que el del título
-        _evts = _game.getInput().getTouchEvents();
-        if(!_evts.isEmpty()){
-            for (Input.TouchEvent t : _evts){
-                if(t.get_action()) {
-                    _currentState = State.Dificulty;
-                    break;
-                }
-            }
-        }
-        render();
-    }
-
     //Posicion del avion y la bomba, y numero de pisos que puede destruir
-    int _planeX,_planeY;
-    int _bombX, _bombY, _bombIntensity;
-    boolean _bombEnded; //Este es para borrar el último sprite de explosión de la bomba
-    boolean _colisioned = false; //Si el avion se la ha pegado, no puede lanzar bombas
-
-    //Pinta cada frame
-    public void render(){
-        if(_canDraw) {
-            _game.getGraphics().startFrame();
-            _game.getGraphics().clear(0xFF000000);
-            _screen.drawScreen(_board, _colorBoard, _images);
-            _game.getGraphics().postFrame();
-        }
-    }
-
-    private void loadImages(){
-        for(int i = 0; i < _images.length; i++) {
-            String name = "ASCII_" + String.format("%02d", i) + ".png";
-            _images[i] = _game.getGraphics().newImage(name);
-        }
-    }
+    private int _planeX,_planeY;
+    private int _bombX, _bombY, _bombIntensity;
+    private boolean _bombEnded; //Este es para borrar el último sprite de explosión de la bomba
+    private boolean _collisioned = false; //Si el avion se la ha pegado, no puede lanzar bombas
 
     //Imagenes con los sprites del juego que se cargarán al inicio
     Image[] _images = new Image[16];
     //El juego le será pasado en el main cuando se construya la lógica
     Game _game;
-
 
     //Este es el tablero, pero tiene los colores y no los sprites
     private int[][] _colorBoard;
@@ -442,117 +523,18 @@ public class Logic {
     253 Colisión 3
     95 Subrayado (separador barra de puntuación)*/
 
-    //Hace que todos los caracteres de la matriz sean un espacio en blanco
-    private void clearBoard(){
-        for(int i = 0; i < _board.length; ++i){
-            for(int j = 0; j < _board[0].length; ++j){
-                _board[i][j] = 32;
-            }
-        }
-    }
-
-    //Va construyendo la ciudad
-    //Cuando termina el tablero ya está relleno y se puede empezar a jugar
-    private void buildCity(){
-        _board = new int[_playingH][_playingW];
-        clearBoard();
-        setColorBoard(_board[0].length,_board.length,_playingInitialColors);
-
-        int[] buildings = new int[11];
-        for(int i = 0; i < buildings.length; ++i)
-            //La altura de cada edificio es 5 - dif sumado a un valor aleatorio hasta el 7
-            buildings[i] = rand.nextInt(8) + (5 - _dificulty);
-
-        int baseX = 4; int baseY = 21; //El lugar donde se empieza a construir el primer edificio
-
-        _lastFrameTime = System.nanoTime();
-        int i = 0;
-        int j = 0;
-        int endedBuildings = 0;
-        while(endedBuildings < buildings.length){
-            long currentTime = System.nanoTime();
-            if(currentTime - _lastFrameTime > 0.1e9){
-                //Primero bloqueo el render
-                _canDraw = false;
-
-                //Si el edificio tiene más de un piso
-                if(buildings[j] > 1){
-                    _board[baseY - i][baseX + j] = 143;
-                    --buildings[j];
-                    ++i;
-                }
-                //Si al edificio le falta un piso
-                else if(buildings[j] == 1){
-                    _board[baseY - i][baseX + j] = 244;
-                    --buildings[j];
-                    ++j;
-                    ++endedBuildings;
-                    i = 0;
-                }
-                //Si el edificio no tiene pisos
-                else if(buildings[j] == 0){
-                    ++j;
-                    ++endedBuildings;
-                    i = 0;
-                }
-
-                //Desbloqueo el render
-                _canDraw = true;
-                render();
-            }
-        }
-        readyGame();
-        render();
-        _currentState = State.Game;
-    }
-
-    //Escribe la línea de puntos debajo de la ciudad
-    //Y coloca el avion en el 0,1
-    private void readyGame(){
-        //GUI
-        for(int i = 0; i < _board[23].length; ++i)
-            _board[23][i] = 95;
-        String s = "PUNTOS";
-        for(int i = 0; i < s.length();++i)
-            _board[24][i] = s.charAt(i);
-        s = "MAX";
-        for(int i = 0; i < s.length();++i)
-            _board[24][12+i] = s.charAt(i);
-
-        //Posicion del avion, tiempo de update
-        // y establecimiento del avion y las bombas
-        _planeX = 1;
-        _planeY = 1;
-
-        _updateTime = (_speed + 1)*0.1e9;
-
-        _colisioned = false;
-        _bombIntensity = 0;
-
-        //Establecemos las puntuaciones iniciales
-        if(!_keepscore) {
-            _score = 0;
-        }
-        setScore();
-        _keepscore = false;
-        setGameHiScore();
-    }
-
     //El screen se encarga del renderizado
     //Y de darte la casilla que has pulsado
     private Screen _screen;
     private Random rand = new Random();
     private List<Input.TouchEvent> _evts;
-    private int _speed, _dificulty;
+    private int _speed, _difficulty;
     private double _updateTime;
 
-    //Vamos a necesitar algún tipo de mutex
-    //para que la hebra de pintado no pinte cuando la lógica se está ejecutando
-    private volatile boolean _canDraw = true;
     State _currentState;
     private long _lastFrameTime;
 
-    //Puntuaciones y relacionado
+    ////////////////Puntuaciones y relacionado////////////////////
     private int _score;
     private int _hiScore = 0;
     private boolean _keepscore = false;
@@ -627,7 +609,7 @@ public class Logic {
             writeRecordLine();
     }
 
-    /////////////Pantallas del juego//////////////////////
+    ///////////////////Pantallas del juego//////////////////////
 
     //Pantalla de introducción
     private int _introW = 40;
@@ -682,12 +664,12 @@ public class Logic {
             "4444444444444444444444444444444444444444";
 
     //Pantalla de selección de dificultad
-    private int _dificultyW = 40;
-    private int _dificultyH = 3;
-    private String _dificultyText = "Elija nivel: 0 (AS) a 5 (principiante)  " +
+    private int _difficultyW = 40;
+    private int _difficultyH = 3;
+    private String _difficultyText = "Elija nivel: 0 (AS) a 5 (principiante)  " +
             "                                        " +
             "          0  1  2  3  4  5              ";
-    private String _dificultyColors = "2222222222222222222222222222222222222222" +
+    private String _difficultyColors = "2222222222222222222222222222222222222222" +
             "2222222222222222222222222222222222222222" +
             "9999999999999999999999999999999999999999";
 
