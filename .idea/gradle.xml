@@ -12,6 +12,8 @@
             <option value="$PROJECT_DIR$/Logic" />
             <option value="$PROJECT_DIR$/android" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/desktop" />
+            <option value="$PROJECT_DIR$/desktopApp" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
