@@ -269,7 +269,8 @@ public class Logic {
         int endedBuildings = 0;
         while(endedBuildings < buildings.length){
             long currentTime = System.nanoTime();
-            if(currentTime - _lastFrameTime > 0.1e9){
+            if(currentTime - _lastFrameTime > 0.05e9){
+                _lastFrameTime = currentTime;
                 //Si el edificio tiene más de un piso
                 if(buildings[j] > 1){
                     _board[baseY - i][baseX + j] = 143;
@@ -297,6 +298,10 @@ public class Logic {
         readyGame();
         render();
         setState(State.Game);
+
+        //Así tiro a la basura cualquier click
+        //durante la construcción
+        _game.getInput().getTouchEvents();
     }
 
     //Escribe la línea de puntos debajo de la ciudad
@@ -395,8 +400,8 @@ public class Logic {
             if (!_evts.isEmpty()) {
                 for (Input.TouchEvent t : _evts) {
                     if (t.get_action()) {
-                        //LO PONGO EXAGERADO PARA PODER PASARME EL JUEGO JEJE
-                        _bombIntensity = rand.nextInt(3) + 20;
+                        //Si el aleatorio no ayuda, no hay quien se lo pase
+                        _bombIntensity = rand.nextInt(5) + 2;
                         if (_planeX == 17){
                             _bombX = 2;
                             _bombY = _planeY + 1;

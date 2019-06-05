@@ -7,11 +7,13 @@ import es.ucm.gdv.aninterface.Input;
 public class DesktopGame implements Game {
     public DesktopGame(String name){
         _graphics = new DesktopGraphics(name);
-        _input = null;
+        _input = new DesktopInput();
     }
 
-    public void init(int w, int h){
-        _graphics.init(w,h);
+    public void init(){
+        _graphics.init();
+        //Le añadimos el listener a la pantalla
+        _graphics.addMouseListener(_input);
     }
 
     @Override

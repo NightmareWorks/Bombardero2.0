@@ -16,8 +16,10 @@ public class DesktopGraphics extends JFrame implements Graphics {
 
     //Inicializa el tamaño de la ventana
     //Y el doble buffer
-    public void init(int width, int height){
-        setSize(width,height);
+    public void init(){
+        //setSize(width,height);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setUndecorated(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
 
@@ -38,7 +40,7 @@ public class DesktopGraphics extends JFrame implements Graphics {
         //Tengo que sacar el awt.image
         java.awt.Image im = null;
         try{
-            im = javax.imageio.ImageIO.read(new java.io.File(name));
+            im = javax.imageio.ImageIO.read(new java.io.File("Resources/" + name));
         }
         catch(Exception e){
             System.out.println(e);
