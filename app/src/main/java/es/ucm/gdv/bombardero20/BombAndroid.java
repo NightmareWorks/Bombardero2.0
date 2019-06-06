@@ -20,6 +20,7 @@ public class BombAndroid extends AppCompatActivity {
         _game.init(this,_view);
         _view.setOnTouchListener((View.OnTouchListener)_game.getInput());
         _logic = new Logic(_game);
+        _logic.loadImages();
 
         setContentView(_view);
 

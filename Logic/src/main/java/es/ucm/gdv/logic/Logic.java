@@ -14,8 +14,6 @@ public class Logic {
         _game = game;
         //Se crea sólo una vez y se adapta según los tableros que tengamos
         _screen = new Screen(_game.getGraphics());
-        //Inicializamos las imágenes
-        loadImages();
 
         setState(State.Intro);
     }
@@ -28,7 +26,7 @@ public class Logic {
         _game.getGraphics().postFrame();
     }
 
-    private void loadImages(){
+    public void loadImages(){
         for(int i = 0; i < _images.length; i++) {
             String name = "ASCII_" + String.format("%02d", i) + ".png";
             _images[i] = _game.getGraphics().newImage(name);
@@ -126,7 +124,7 @@ public class Logic {
         _evts = _game.getInput().getTouchEvents();
         if(!_evts.isEmpty()){
             for (Input.TouchEvent t : _evts){
-                if(t.get_action()) {
+                if(t.getAction()) {
                     setState(State.Difficulty);
                     break;
                 }
@@ -140,9 +138,9 @@ public class Logic {
         if(!_evts.isEmpty()){
             int[] cell;
             for (Input.TouchEvent t : _evts){
-                if(t.get_action()) {
+                if(t.getAction()) {
                     //Comprobamos en qué casilla se ha pulsado
-                    cell = _screen.cellTouched(t.get_x(),t.get_y());
+                    cell = _screen.cellTouched(t.getX(),t.getY());
                     if(cell != null){
                         if(cell[0] == 2){
                             switch (cell[1]){
@@ -186,9 +184,9 @@ public class Logic {
         if(!_evts.isEmpty()){
             int[] cell;
             for (Input.TouchEvent t : _evts){
-                if(t.get_action()) {
+                if(t.getAction()) {
                     //Comprobamos en qué casilla se ha pulsado
-                    cell = _screen.cellTouched(t.get_x(),t.get_y());
+                    cell = _screen.cellTouched(t.getX(),t.getY());
                     if(cell != null){
                         if(cell[0] == 2){
                             switch (cell[1]){
@@ -399,7 +397,7 @@ public class Logic {
             _evts = _game.getInput().getTouchEvents();
             if (!_evts.isEmpty()) {
                 for (Input.TouchEvent t : _evts) {
-                    if (t.get_action()) {
+                    if (t.getAction()) {
                         //Si el aleatorio no ayuda, no hay quien se lo pase
                         _bombIntensity = rand.nextInt(5) + 2;
                         if (_planeX == 17){
@@ -463,6 +461,9 @@ public class Logic {
                 else
                     _record = false;
                 setState(State.Score);
+
+                //Tiramos las pulsaciones anteriores
+                _game.getInput().getTouchEvents();
             }
             //Si no, seguimos
             else{

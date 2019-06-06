@@ -9,6 +9,7 @@ public class Main {
         Game game = new DesktopGame("Bombardero");
         ((DesktopGame) game).init();
         Logic logic = new Logic(game);
+        logic.loadImages();
 
         while(true){
             logic.run();

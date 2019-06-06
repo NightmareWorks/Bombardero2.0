@@ -15,7 +15,7 @@ public class AndroidInput implements Input, View.OnTouchListener {
         synchronized (this){
             ArrayList<TouchEvent> touches = new ArrayList<TouchEvent>();
             for(TouchEvent t : _events){
-                TouchEvent copy = new TouchEvent(t.get_x(),t.get_y(),t.get_action());
+                TouchEvent copy = new TouchEvent(t.getX(),t.getY(),t.getAction());
                 touches.add(copy);
             }
             _events.clear();

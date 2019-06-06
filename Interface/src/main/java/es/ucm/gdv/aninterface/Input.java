@@ -14,17 +14,17 @@ public interface Input {
             this._action = action;
         }
 
-        public int get_x() {
+        public int getX() {
             return _x;
         }
 
-        public int get_y() {
+        public int getY() {
             return _y;
         }
 
         private int _x, _y;
 
-        public boolean get_action() {
+        public boolean getAction() {
             return _action;
         }
 

@@ -50,13 +50,7 @@ public class DesktopGraphics extends JFrame implements Graphics {
 
     @Override
     public void clear(int color) {
-        Color c;
-        switch (color){
-            default:
-                c = Color.BLACK;
-                break;
-        }
-
+        Color c = new Color(color);
         _g.setColor(c);
         _g.fillRect(0,0,getWidth(),getHeight());
     }
