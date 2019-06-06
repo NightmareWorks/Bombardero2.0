@@ -22,6 +22,8 @@ public class AndroidGraphics implements Graphics {
     public AndroidGraphics(Context context, SurfaceView surface){
         _assetManager = context.getAssets();
         _surface = surface;
+
+        //Panatalla completa
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         Display display = wm.getDefaultDisplay();
         Point size = new Point();

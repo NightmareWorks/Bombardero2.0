@@ -53,10 +53,9 @@ public class BombAndroid extends AppCompatActivity {
         public void resume(){
             if(!_running){
                 _running = true;
-                // Si llamamos al run() no tenemos separado de la hebra de UI.
-                // Para crear una hebra necesitamos una clase que herede de Runnable
+                // Creamos la hebra que lleva el run()
                 _runningThread = new Thread(this);
-                _runningThread.start(); //Este método hará sus cosas y vuelve, en paralelo se ejecutará el run.
+                _runningThread.start(); //En paralelo se ejecutará el run.
 
             }//if !running
         } //resume
@@ -72,7 +71,6 @@ public class BombAndroid extends AppCompatActivity {
                 }//Catch
             }//While
 
-            //El pause y el run estan en hebras diferentes
         }//Pause
 
         @Override

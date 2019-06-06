@@ -1,7 +1,5 @@
 package es.ucm.gdv.logic;
 
-import java.util.Map;
-
 import es.ucm.gdv.aninterface.Graphics;
 import es.ucm.gdv.aninterface.Image;
 

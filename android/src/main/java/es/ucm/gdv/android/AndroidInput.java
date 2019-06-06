@@ -13,7 +13,7 @@ public class AndroidInput implements Input, View.OnTouchListener {
     @Override
     public List<TouchEvent> getTouchEvents() {
         synchronized (this){
-            ArrayList<TouchEvent> touches = new ArrayList<TouchEvent>();
+            ArrayList<TouchEvent> touches = new ArrayList<>();
             for(TouchEvent t : _events){
                 TouchEvent copy = new TouchEvent(t.getX(),t.getY(),t.getAction());
                 touches.add(copy);

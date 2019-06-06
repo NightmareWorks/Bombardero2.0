@@ -26,6 +26,7 @@ public class Logic {
         _game.getGraphics().postFrame();
     }
 
+    //Se llama desde fuera, cuando se inicializa la lógica
     public void loadImages(){
         for(int i = 0; i < _images.length; i++) {
             String name = "ASCII_" + String.format("%02d", i) + ".png";
@@ -46,21 +47,21 @@ public class Logic {
         }
     }
 
-    //Hace que todos los caracteres de la matriz sean un espacio en blanco
-    private void clearBoard(){
-        for(int i = 0; i < _board.length; ++i){
-            for(int j = 0; j < _board[0].length; ++j){
-                _board[i][j] = 32;
-            }
-        }
-    }
-
     //Más específico que el anterior, sólo se llama en la pantalla de juego
     private void setColorBoard(int w, int h, String colorsGrid){
         _colorBoard = new int[h][w];
         for(int i = 0; i < h; ++i){
             for(int j = 0; j < w; ++j){
                 _colorBoard[i][j] = Integer.parseInt(String.valueOf(colorsGrid.charAt(i * w + j)));
+            }
+        }
+    }
+
+    //Hace que todos los caracteres de la matriz sean un espacio en blanco
+    private void clearBoard(){
+        for(int i = 0; i < _board.length; ++i){
+            for(int j = 0; j < _board[0].length; ++j){
+                _board[i][j] = 32;
             }
         }
     }
@@ -512,13 +513,12 @@ public class Logic {
     private boolean _collisioned = false; //Si el avion se la ha pegado, no puede lanzar bombas
 
     //Imagenes con los sprites del juego que se cargarán al inicio
-    Image[] _images = new Image[16];
+    private Image[] _images = new Image[16];
     //El juego le será pasado en el main cuando se construya la lógica
-    Game _game;
+    private Game _game;
 
     //Este es el tablero, pero tiene los colores y no los sprites
     private int[][] _colorBoard;
-
     //Este es el tablero lógico sobre el que se hacen las transformaciones
     //Lleva un int por casilla con el ascii correspondiente al símbolo a pintar
     private int[][] _board;
@@ -542,7 +542,7 @@ public class Logic {
     private int _speed, _difficulty;
     private double _updateTime;
 
-    State _currentState;
+    private State _currentState;
     private long _lastFrameTime;
 
     ////////////////Puntuaciones y relacionado////////////////////
@@ -620,7 +620,9 @@ public class Logic {
             writeRecordLine();
     }
 
-    ///////////////////Pantallas del juego//////////////////////
+
+
+    ///////////////////PANTALLAS DEL JUEGO//////////////////////
 
     //Pantalla de introducción
     private int _introW = 40;

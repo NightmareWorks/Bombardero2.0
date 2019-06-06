@@ -12,6 +12,7 @@ public class DesktopGame implements Game {
 
     public void init(){
         _graphics.init();
+
         //Le añadimos el listener a la pantalla
         _graphics.addMouseListener(_input);
         _graphics.addKeyListener(_input);

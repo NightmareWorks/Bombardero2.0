@@ -21,7 +21,8 @@ public interface Graphics {
     int getWidth();
     int getHeight();
 
-    //Inicio y fin del pintado
+    //Prepara para pintar
     void startFrame();
+    //Dibuja el frame
     void postFrame();
 }

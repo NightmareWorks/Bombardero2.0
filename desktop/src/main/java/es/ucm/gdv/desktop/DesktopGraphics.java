@@ -17,7 +17,7 @@ public class DesktopGraphics extends JFrame implements Graphics {
     //Inicializa el tamaño de la ventana
     //Y el doble buffer
     public void init(){
-        //setSize(width,height);
+        //setSize(width,height); //Si se le especificase un tamaño
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setUndecorated(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -37,7 +37,7 @@ public class DesktopGraphics extends JFrame implements Graphics {
 
     @Override
     public Image newImage(String name) {
-        //Tengo que sacar el awt.image
+        //Tengo que sacar el awt.image para la constructora de DesktopImage
         java.awt.Image im = null;
         try{
             im = javax.imageio.ImageIO.read(new java.io.File("Resources/" + name));
