@@ -12,6 +12,7 @@ public class Main {
 
         while(true){
             logic.run();
+            logic.render();
         }
     }
 }

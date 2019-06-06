@@ -77,6 +77,7 @@ public class BombAndroid extends AppCompatActivity {
         public void run(){
             while(_running) {
                 _logic.run();
+                _logic.render();
             }
         }
 

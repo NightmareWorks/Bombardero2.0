@@ -90,7 +90,6 @@ public class Logic {
             default:
                 break;
         }
-        render();
     }
 
     //Método auxiliar para cambiar de estado
