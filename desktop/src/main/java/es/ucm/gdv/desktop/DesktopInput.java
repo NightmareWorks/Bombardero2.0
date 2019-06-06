@@ -1,6 +1,8 @@
 package es.ucm.gdv.desktop;
 
 import java.awt.Point;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
@@ -8,7 +10,7 @@ import java.util.List;
 
 import es.ucm.gdv.aninterface.Input;
 
-public class DesktopInput implements Input, MouseListener {
+public class DesktopInput implements Input, MouseListener, KeyListener {
     public DesktopInput(){
         _events = new ArrayList<>();
     }
@@ -52,4 +54,23 @@ public class DesktopInput implements Input, MouseListener {
     }
 
     ArrayList<TouchEvent> _events;
+
+    @Override
+    public void keyTyped(KeyEvent keyEvent) {
+
+    }
+
+    @Override
+    public void keyPressed(KeyEvent keyEvent) {
+        if(keyEvent.getKeyChar() == ' '){
+            synchronized (this){
+                _events.add(new TouchEvent(0, 0, true));
+            }
+        }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent keyEvent) {
+
+    }
 }
